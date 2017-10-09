@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
-import Progress from './components/progress'
-import Header from './components/header'
-import $ from 'jquery'
-import 'jplayer'
-let duration=null;
+import Player from './page/player';
+import Header from './components/header';
+import $ from 'jquery';
+import 'jplayer';
+import music_list from './components/music_list';
+console.log(music_list);
+
 class Root extends Component{
     constructor(props) {
         super(props);
         this.state = {
             progress: 0,
-            barColor:'#00f'
+            barColor:'#00f',
+            currentMusicItem:1
         }
     }
     componentDidMount() {
@@ -23,37 +26,18 @@ class Root extends Component{
             wmode: "window",
             useStateClassSkin: true
         });
-        $("#player").on($.jPlayer.event.timeupdate, (e) => {
-            duration=e.jPlayer.status.duration;
-            this.setState({
-                progress:e.jPlayer.status.currentPercentAbsolute
-            });
-        });
     }
     componentWillUnMount() {
-        $("#player").off($.jPlayer.event.timeupdate);
-    }
-    counterHandler() {
-        this.setState({
-            count: this.state.count + 1
-        });
-    }
-    progressChangeHandler(progress){
-        $("#player").jPlayer('play',duration*progress)
+
     }
     render() {
         return (
             <div>
-                <Header/>
-                <Progress
-                    progress={this.state.progress}
-                    onProgressChange={
-                        this.progressChangeHandler
-                    }
-                >
-                </Progress>
+                <Header>
+                </Header>
+                <Player>
+                </Player>
                 <div id="player">
-
                 </div>
             </div>
         );
