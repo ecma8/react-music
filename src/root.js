@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import Player from './page/player';
 import Header from './components/header';
+import List from './page/list';
 import $ from 'jquery';
-import 'jplayer';
-import music_list from './components/music_list';
-console.log(music_list);
 
-class Root extends Component{
+import 'jplayer';
+import './static/common.css';
+import PubSub from 'pubsub-js'
+import music_list from './components/music_list';
+class App extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            progress: 0,
+            progress: '10%',
             barColor:'#00f',
-            currentMusicItem:1
-        }
+            musicList: music_list,
+            currentMusicItem: {}
+        };
+        this.playMusic=this.playMusic.bind(this);
     }
     componentDidMount() {
         $("#player").jPlayer({
@@ -26,22 +30,40 @@ class Root extends Component{
             wmode: "window",
             useStateClassSkin: true
         });
+        PubSub.subscribe('PLAY_MUSIC', (msg, item) => {
+            this.playMusic(item);
+        });
+        PubSub.subscribe('DEL_MUSIC', (msg, item) => {
+            this.setState({
+                musicList: this.state.musicList.filter((music) => {
+                    return music !== item;
+                })
+            });
+        });
     }
     componentWillUnMount() {
 
+    }
+    playMusic(item) {
+        $("#player").jPlayer("setMedia", {
+            mp3: item.file
+        }).jPlayer('play');
+        this.setState({
+            currentMusicItem: item
+        });
     }
     render() {
         return (
             <div>
                 <Header>
                 </Header>
-                <Player>
+                <Player currentMusicItem={this.state.currentMusicItem}>
                 </Player>
                 <div id="player">
                 </div>
+                <List musicList={this.state.musicList}></List>
             </div>
         );
     }
 }
-
-export default Root;
+export default App;
