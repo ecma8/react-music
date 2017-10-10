@@ -15,21 +15,20 @@ class App extends Component{
             progress: '10%',
             barColor:'#00f',
             musicList: music_list,
-            currentMusicItem: {}
+            currentMusicItem: {},
+            count:0,
+            repeatType: 'cycle'
         };
         this.playMusic=this.playMusic.bind(this);
+        this.playNext=this.playNext.bind(this);
     }
     componentDidMount() {
         $("#player").jPlayer({
-            ready: function () {
-                $(this).jPlayer("setMedia", {
-                    mp3: "http://oj4t8z2d5.bkt.clouddn.com/%E9%AD%94%E9%AC%BC%E4%B8%AD%E7%9A%84%E5%A4%A9%E4%BD%BF.mp3"
-                }).jPlayer('play');
-            },
             supplied: "mp3",
             wmode: "window",
             useStateClassSkin: true
         });
+        this.playMusic(music_list[0]);
         PubSub.subscribe('PLAY_MUSIC', (msg, item) => {
             this.playMusic(item);
         });
@@ -40,9 +39,36 @@ class App extends Component{
                 })
             });
         });
+        PubSub.subscribe('PLAY_NEXT', () => {
+            this.playNext();
+        });
+        PubSub.subscribe('PLAY_PREV', () => {
+            this.playNext('prev');
+        });
+        let repeatList = [
+            'cycle',
+            'once',
+            'random'
+        ];
+        PubSub.subscribe('CHANAGE_REPEAT', () => {
+            let index = repeatList.indexOf(this.state.repeatType);
+            index = (index + 1) % repeatList.length;
+            this.setState({
+                repeatType: repeatList[index]
+            });
+        });
+    }
+    counterHandler() {
+        this.setState({
+            count: this.state.count + 1
+        });
     }
     componentWillUnMount() {
-
+        PubSub.unsubscribe('PLAY_MUSIC');
+        PubSub.unsubscribe('DEL_MUSIC');
+        PubSub.unsubscribe('CHANAGE_REPEAT');
+        PubSub.unsubscribe('PLAY_NEXT');
+        PubSub.unsubscribe('PLAY_PREV');
     }
     playMusic(item) {
         $("#player").jPlayer("setMedia", {
@@ -51,6 +77,23 @@ class App extends Component{
         this.setState({
             currentMusicItem: item
         });
+    }
+    playNext(type = 'next') {
+        let index = this.findMusicIndex(this.state.currentMusitItem);
+        if (type === 'next') {
+            index = (index + 1) % this.state.musicList.length;
+        } else {
+            index = (index + this.state.musicList.length - 1) % this.state.musicList.length;
+        }
+        let musicItem = this.state.musicList[index];
+        this.setState({
+            currentMusitItem: musicItem
+        });
+        this.playMusic(musicItem);
+    }
+    findMusicIndex(music) {
+        let index = this.state.musicList.indexOf(music);
+        return Math.max(0, index);
     }
     render() {
         return (
