@@ -4,9 +4,9 @@ import './header.css'
 class Header extends Component {
     render(){
         return (
-            <div className="abc">
-                <img src={logo} alt=""/>
-                <h1 className="caption">react music app</h1>
+            <div className="row components-logo">
+                <img src={logo} width="40" alt="" className="-col-auto"/>
+                <h1 className="caption">Music Player Build By React</h1>
             </div>
         );
     }
