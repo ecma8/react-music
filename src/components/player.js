@@ -1,34 +1,39 @@
 import React, { Component } from 'react';
-import 'jplayer';
 import {Link} from 'react-router';
 import Progress from './progress'
 import './player.css';
-let PubSub = require('pubsub-js');
+import PubSub from 'pubsub-js';
 
 class Player extends Component{
 	constructor(props){
 		super(props);
         this.state ={
             progress: 0,
-            volume: 0,
+            volume: 30,
             isPlay: true,
             leftTime: 0
         };
-        this.play=this.play.bind(this);
-	}
-	componentDidMount() {
+        this.timer=null
+    }
+	componentDidMount(){
         let audio =document.getElementById(`audio`);
-        audio.volume=this.state.volume/100;
-        audio.ontimeupdate=()=>{
-            let bl=audio.currentTime/audio.duration;
-            this.setState({
-				progress: bl*100,
-		 		leftTime: this.formatTime(audio.duration * (1 - bl))
-			});
-		}
-	}
-	componentWillUnmount() {
+        this.timer = setTimeout(() => {
+            audio.ontimeupdate=()=>{
+                let bl=audio.currentTime/audio.duration;
+                if(bl===1){
+                    PubSub.publish('END');
+                }
+                this.setState({
+                    progress: bl*100,
+                    leftTime: this.formatTime(audio.duration * (1 - bl))
 
+                });
+            }
+        }, 1000);
+    }
+	componentWillUnmount(){
+	    console.log(this.timer);
+	    clearTimeout(this.timer)
 	}
 	formatTime = (time) =>{
 		time = Math.floor(time);
@@ -87,7 +92,6 @@ class Player extends Component{
 					                <Progress
 										progress={this.state.volume}
 										onProgressChange={this.changeVolumeHandler}
-										barColor='#f00'
 					                >
 					                </Progress>
                 				</div>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Player from './components/player';
 import Header from './components/header';
 import List from './components/list';
-import { randomRange } from './utils/util';
+import randomRange from './utils/util';
 import Audio from './components/Audio';
 import { Router, IndexRoute, Route, hashHistory} from 'react-router';
 import './static/common.css';
@@ -13,7 +13,6 @@ class App extends Component{
         super(props);
         this.state = {
             progress: 0,
-            barColor:'#00f',
             musicList: music_list,
             currentMusicItem: {},
             count:0,
@@ -39,6 +38,9 @@ class App extends Component{
                     return music !== item;
                 })
             });
+        });
+        PubSub.subscribe('END', (msg, item) => {
+            this.playWhenEnd();
         });
         PubSub.subscribe('PLAY_NEXT', () => {
             this.playNext();
@@ -78,17 +80,18 @@ class App extends Component{
             this.playNext();
         }
     };
-    componentWillUnMount() {
+    componentWillUnMount=()=>{
         PubSub.unsubscribe('PLAY_MUSIC');
         PubSub.unsubscribe('DEL_MUSIC');
         PubSub.unsubscribe('CHANGE_REPEAT');
         PubSub.unsubscribe('PLAY_NEXT');
         PubSub.unsubscribe('PLAY_PREV');
-    }
+        PubSub.unsubscribe('END');
+    };
     playMusic=(item)=>{
         let audio =document.getElementById(`audio`);
         audio.src = item.file;
-        audio.volume=0.3;
+        audio.load();
         audio.play();
         this.setState({
             currentMusicItem: item
@@ -114,7 +117,7 @@ class App extends Component{
     render() {
         return (
             <div className="container">
-                <Header></Header>
+                <Header/>
                 <Audio/>
                 {React.cloneElement(this.props.children, this.state)}
             </div>
