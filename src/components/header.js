@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import logo from '../static/img/music.png'
-import './header.css'
+import '../static/css/header.css'
 class Header extends Component {
     render(){
         return (

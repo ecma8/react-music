@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import ListItem from './listItem';
-import './listitem.css';
+import '../static/css/listitem.css';
 class List extends Component{
     render() {
         let Items = this.props.musicList.map((item) => {

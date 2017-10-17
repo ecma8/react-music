@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import Player from './components/player';
-import Header from './components/header';
-import List from './components/list';
-import randomRange from './utils/util';
-import Audio from './components/Audio';
+import Player from './player';
+import Header from './header';
+import List from './list';
+import randomRange from '../utils/util';
+import Audio from './audio';
 import { Router, IndexRoute, Route, hashHistory} from 'react-router';
-import './static/common.css';
+import '../static/css/common.css';
 import PubSub from 'pubsub-js'
-import music_list from './components/music_list';
+import music_list from '../json/music_list';
 class App extends Component{
     constructor(props) {
         super(props);
@@ -20,15 +20,7 @@ class App extends Component{
         };
     }
     componentDidMount() {
-        // $("#player").jPlayer({
-        //     supplied: "mp3",
-        //     wmode: "window",
-        //     useStateClassSkin: true
-        // });
         this.playMusic(music_list[0]);
-        // $("#player").bind($.jPlayer.event.ended, (e) => {
-        //     this.playWhenEnd();
-        // });
         PubSub.subscribe('PLAY_MUSIC', (msg, item) => {
             this.playMusic(item);
         });
@@ -39,7 +31,7 @@ class App extends Component{
                 })
             });
         });
-        PubSub.subscribe('END', (msg, item) => {
+        PubSub.subscribe('END', () => {
             this.playWhenEnd();
         });
         PubSub.subscribe('PLAY_NEXT', () => {
@@ -80,7 +72,7 @@ class App extends Component{
             this.playNext();
         }
     };
-    componentWillUnMount=()=>{
+    componentWillUnmount(){
         PubSub.unsubscribe('PLAY_MUSIC');
         PubSub.unsubscribe('DEL_MUSIC');
         PubSub.unsubscribe('CHANGE_REPEAT');

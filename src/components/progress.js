@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './progress.css';
+import '../static/css/progress.css';
 class Progress extends Component{
     constructor(aaa) {
         super(aaa);

@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router';
 import Progress from './progress'
-import './player.css';
+import '../static/css/player.css';
 import PubSub from 'pubsub-js';
-
 class Player extends Component{
 	constructor(props){
 		super(props);
@@ -11,34 +10,31 @@ class Player extends Component{
             progress: 0,
             volume: 30,
             isPlay: true,
-            leftTime: 0
+            leftTime: '0:00',
+
         };
-        this.timer=null
     }
 	componentDidMount(){
         let audio =document.getElementById(`audio`);
-        this.timer = setTimeout(() => {
-            audio.ontimeupdate=()=>{
-                let bl=audio.currentTime/audio.duration;
-                if(bl===1){
-                    PubSub.publish('END');
-                }
-                this.setState({
-                    progress: bl*100,
-                    leftTime: this.formatTime(audio.duration * (1 - bl))
-
-                });
+		audio.addEventListener('timeupdate',()=> {
+            let bl = audio.currentTime / audio.duration;
+            if (bl === 1) {
+                PubSub.publish('END');
             }
-        }, 1000);
+            this.setState({
+                progress: bl * 100,
+                leftTime: this.formatTime(audio.duration * (1 - bl))
+            });
+        })
     }
 	componentWillUnmount(){
-	    console.log(this.timer);
-	    clearTimeout(this.timer)
+        let audio =document.getElementById(`audio`);
+        audio.removeEventListener('timeupdate',()=>null,false)
 	}
 	formatTime = (time) =>{
 		time = Math.floor(time);
-		let miniute = Math.floor(time / 60);
-		let seconds = Math.floor(time % 60);
+		let miniute =time? Math.floor(time / 60):0;
+		let seconds =time? Math.floor(time % 60):0;
 		return miniute + ':' + (seconds < 10 ? '0' + seconds : seconds);
 	};
 	changeProgressHandler = (progress) =>{

@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import PubSub from 'pubsub-js';
-require('./listitem.less');
+import '../static/css/listitem.css';
 
 class ListItem extends Component{
     deleteHandler=(item, event)=>{
