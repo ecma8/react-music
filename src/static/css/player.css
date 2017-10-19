@@ -16,6 +16,7 @@
   width: 180px;
   height: 180px;
   border-radius: 50%;
+  animation: img_rotate 20s linear infinite ;
 }
 .player-page .volume-container {
   position: relative;
@@ -59,4 +60,12 @@
 .player-page .volume-wrapper {
   width: 60px;
   display: inline-block;
+}
+@keyframes img_rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
