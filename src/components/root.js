@@ -20,6 +20,7 @@ class App extends Component{
         };
     }
     componentDidMount() {
+
         this.playMusic(music_list[0]);
         PubSub.subscribe('PLAY_MUSIC', (msg, item) => {
             this.playMusic(item);

@@ -10,26 +10,25 @@ class Player extends Component{
             progress: 0,
             volume: 30,
             isPlay: true,
-            leftTime: '0:00',
-
+            leftTime: '0:00'
         };
     }
 	componentDidMount(){
         let audio =document.getElementById(`audio`);
 		audio.addEventListener('timeupdate',()=> {
-            let bl = audio.currentTime / audio.duration;
-            if (bl === 1) {
-                PubSub.publish('END');
-            }
-            this.setState({
-                progress: bl * 100,
-                leftTime: this.formatTime(audio.duration * (1 - bl))
-            });
-        })
+			let bl = audio.currentTime / audio.duration;
+			if (bl === 1) {
+				PubSub.publish('END');
+			}
+			this.setState({
+				progress: bl * 100,
+				leftTime: this.formatTime(audio.duration * (1 - bl))
+			});
+		})
     }
 	componentWillUnmount(){
         let audio =document.getElementById(`audio`);
-        audio.removeEventListener('timeupdate',()=>null,false)
+        audio.addEventListener('timeupdate',()=> null)
 	}
 	formatTime = (time) =>{
 		time = Math.floor(time);
