@@ -11,24 +11,27 @@ class Player extends Component{
             volume: 30,
             isPlay: true,
             leftTime: '0:00'
-        };
+    	};
     }
+	audio=()=>{
+		return document.getElementById(`audio`);
+	};
 	componentDidMount(){
-        let audio =document.getElementById(`audio`);
-		audio.addEventListener('timeupdate',()=> {
-			let bl = audio.currentTime / audio.duration;
-			if (bl === 1) {
-				PubSub.publish('END');
-			}
-			this.setState({
-				progress: bl * 100,
-				leftTime: this.formatTime(audio.duration * (1 - bl))
-			});
-		})
+		this.audio().addEventListener('timeupdate',this.timeUpdate);
     }
+    timeUpdate=()=>{
+        let bl = this.audio().currentTime / this.audio().duration;
+        if (bl === 1) {
+            PubSub.publish('END');
+        }
+        this.setState({
+            progress: bl * 100,
+            leftTime: this.formatTime(this.audio().duration * (1 - bl))
+        });
+
+	};
 	componentWillUnmount(){
-        let audio =document.getElementById(`audio`);
-        audio.addEventListener('timeupdate',()=> null)
+        this.audio().removeEventListener('timeupdate',this.timeUpdate)
 	}
 	formatTime = (time) =>{
 		time = Math.floor(time);
@@ -37,26 +40,23 @@ class Player extends Component{
 		return miniute + ':' + (seconds < 10 ? '0' + seconds : seconds);
 	};
 	changeProgressHandler = (progress) =>{
-        let audio =document.getElementById(`audio`);
-        audio.currentTime=audio.duration*progress;
+        this.audio().currentTime=this.audio().duration*progress;
 		this.setState({
 			isPlay: true,
 			progress:progress*100
 		});
 	};
 	changeVolumeHandler = (progress) =>{
-        let audio =document.getElementById(`audio`);
-        audio.volume=progress;
+        this.audio().volume=progress;
         this.setState({
             volume: progress*100
         });
 	};
 	play = () => {
-        let audio =document.getElementById(`audio`);
 		if (this.state.isPlay) {
-            audio.pause();
+            this.audio().pause();
 		} else {
-            audio.play();
+            this.audio().play();
         }
 		this.setState({
 			isPlay: !this.state.isPlay
@@ -64,12 +64,21 @@ class Player extends Component{
 	};
 	next = () =>{
 		PubSub.publish('PLAY_NEXT');
+        this.setState({
+            isPlay: true
+        });
 	};
     prev = () =>{
 		PubSub.publish('PLAY_PREV');
+        this.setState({
+            isPlay: true
+        });
 	};
 	changeRepeat = () =>{
 		PubSub.publish('CHANGE_REPEAT');
+        this.setState({
+            isPlay: true
+        });
 	};
     render() {
         return (
@@ -87,6 +96,7 @@ class Player extends Component{
 					                <Progress
 										progress={this.state.volume}
 										onProgressChange={this.changeVolumeHandler}
+										barColor="#f00"
 					                >
 					                </Progress>
                 				</div>
@@ -118,4 +128,5 @@ class Player extends Component{
         );
     }
 }
+Player.audio=document.getElementById('audio');
 export default Player;

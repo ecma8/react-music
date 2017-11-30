@@ -3,7 +3,6 @@ import '../static/css/progress.css';
 class Progress extends Component{
     constructor(aaa) {
         super(aaa);
-        this.changeProgress=this.changeProgress.bind(this);
     }
     static defaultProps = {
         barColor: '#ff24ea'
